@@ -5,6 +5,18 @@ const App = props => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
 
+
+  const [filterText, setFilterText] = useState(''); // Aggiungi stato per il testo del filtro
+
+  const handleFilterChange = text => {
+    setFilterText(text); // Aggiorna lo stato del testo del filtro
+  };
+
+  const filteredMovies = movies.filter(
+    movie => movie.title.toLowerCase().includes(filterText.toLowerCase())
+  );
+
+
   const fetchMovies = () => {
     setLoading(true);
 
@@ -20,12 +32,18 @@ const App = props => {
     fetchMovies();
   }, []);
 
+  // useEffect(()=>{
+  //   filteredMovies();
+  // },[filterText])
+
   return (
     <Layout>
       <Heading />
 
+      <Filter onFilterChange={handleFilterChange} /> {/* Passa la funzione di gestione del filtro al componente Filter */}
+
       <MovieList loading={loading}>
-        {movies.map((item, key) => (
+        {filteredMovies.map((item, key) => (
           <MovieItem key={key} {...item} />
         ))}
       </MovieList>
@@ -54,6 +72,22 @@ const Heading = props => {
         Explore the whole collection of movies
       </p>
     </div>
+  );
+};
+
+const Filter = ({ onFilterChange }) => {
+  const handleInputChange = event => {
+    const { value } = event.target;
+    onFilterChange(value); // Passa il valore del filtro alla funzione di gestione nel componente padre
+  };
+
+  return (
+    <div  className="flex justify-center items-center mb-4"><input
+      type="text"
+      placeholder="Search movies..."
+      onChange={handleInputChange}
+      className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-400"
+    /></div>
   );
 };
 
